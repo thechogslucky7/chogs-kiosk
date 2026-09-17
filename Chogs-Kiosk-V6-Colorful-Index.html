@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#5b4bdb">
+<title>Chogs Kiosk Income Monitor V6</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --ink:#172033;--muted:#68738a;--bg:#f6f7fb;--white:#fff;
+  --purple:#6847e8;--blue:#2387f5;--pink:#ee36b8;
+  --green:#18b878;--orange:#f58a19;--red:#ed426f;--cyan:#14b8c8;
+  --line:#dfe4f0;
+}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.header{
+  color:white;padding:22px 16px 16px;position:sticky;top:0;z-index:10;
+  background:linear-gradient(135deg,#ee36b8 0%,#7646e9 45%,#167ff3 100%);
+  box-shadow:0 8px 28px #3f37a522;border-bottom-left-radius:26px;border-bottom-right-radius:26px;
+}
+.brand{display:flex;align-items:center;gap:13px;max-width:980px;margin:auto}
+.logo{width:66px;height:66px;border:1px solid #ffffff66;border-radius:20px;background:#ffffff24;display:grid;place-items:center;font-weight:900;font-size:26px;box-shadow:inset 0 1px #fff5}
+h1{font-size:25px;margin:0 0 2px;line-height:1.1}
+.header small{font-size:14px;opacity:.9}
+.top-actions{margin-left:auto;display:flex;gap:8px}
+.icon-btn{width:44px;height:44px;border:0;border-radius:14px;background:#ffffff22;color:#fff;font-size:21px}
+nav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px auto 0;max-width:980px}
+nav button{border:0;border-radius:15px;padding:13px 8px;font-weight:800;font-size:15px;background:#ffffff26;color:#fff}
+nav button.active{background:#fff;color:#5943d9;box-shadow:0 4px 12px #0002}
+.wrap{max-width:980px;margin:auto;padding:18px 14px 34px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.stat{min-height:108px;border-radius:20px;padding:17px;background:#fff;box-shadow:0 5px 20px #1b255012;position:relative;overflow:hidden}
+.stat:before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--accent)}
+.stat .label{font-size:15px;font-weight:800;color:var(--muted)}
+.stat b{display:block;font-size:25px;margin-top:9px}
+.green{--accent:var(--green);background:linear-gradient(135deg,#effdf6,#fff)}
+.blue{--accent:var(--blue);background:linear-gradient(135deg,#eef6ff,#fff)}
+.purple{--accent:var(--purple);background:linear-gradient(135deg,#f5f0ff,#fff)}
+.pink{--accent:var(--pink);background:linear-gradient(135deg,#fff0f7,#fff)}
+.orange{--accent:var(--orange);background:linear-gradient(135deg,#fff7ea,#fff)}
+.cyan{--accent:var(--cyan);background:linear-gradient(135deg,#edfbfc,#fff)}
+.card{background:#fff;border-radius:22px;padding:20px;margin-top:14px;box-shadow:0 5px 20px #1b255012}
+.card h2,.card h3{margin:0 0 14px}
+.period-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.period-item{padding:14px;border-radius:16px;background:#f7f7ff}
+.period-item .note{display:block;margin-bottom:5px}
+.note{font-size:13px;color:var(--muted)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field label{font-size:14px;font-weight:800;display:block;margin:0 0 7px}
+input,select{width:100%;padding:14px 15px;border:1.5px solid var(--line);border-radius:15px;font-size:16px;background:#fff;color:var(--ink);outline:none;min-width:0}
+input:focus,select:focus{border-color:#7b5cf0;box-shadow:0 0 0 4px #7b5cf01c}
+.service-wrap{position:relative}
+.service-wrap select{border-color:#b9d3ff;background:#f5f9ff;font-weight:700}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}
+.btn{border:0;border-radius:15px;padding:14px 16px;font-weight:800;font-size:15px}
+.primary{color:#fff;background:linear-gradient(90deg,#1888f5,#c52ddd);box-shadow:0 6px 16px #8b48e52b}
+.muted{background:#eef0f6;color:#46516a}
+.danger{background:#ffe8ee;color:#df315b}
+.table-wrap{overflow:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+th,td{padding:11px 7px;border-bottom:1px solid #e9ecf3;text-align:left;vertical-align:top}
+th{color:var(--muted);font-size:12px}
+.empty{text-align:center;color:var(--muted);padding:28px}
+.hidden{display:none}
+.bottom-nav{position:sticky;bottom:0;background:#ffffffef;backdrop-filter:blur(15px);border-top:1px solid #e5e8f0;padding:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;z-index:9}
+.bottom-nav button{border:0;background:transparent;border-radius:13px;padding:9px 5px;font-weight:800;color:#59637a}
+.bottom-nav button.active{background:#eee9ff;color:#5539d5}
+.small-actions{display:flex;gap:9px;flex-wrap:wrap}
+@media(max-width:600px){
+  .header{padding:18px 14px 14px}
+  .logo{width:58px;height:58px}
+  h1{font-size:21px}
+  .top-actions{display:none}
+  nav{margin-top:15px}
+  nav button{font-size:14px;padding:12px 5px}
+  .grid{grid-template-columns:1fr 1fr}
+  .form-grid{grid-template-columns:1fr}
+  .period-grid{grid-template-columns:1fr 1fr}
+  .actions{grid-template-columns:1fr}
+  .stat{min-height:96px;padding:14px}
+  .stat b{font-size:22px}
+}
+@media(min-width:800px){
+  .grid{grid-template-columns:repeat(4,1fr)}
+  .bottom-nav{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="brand">
+    <div class="logo">CK</div>
+    <div>
+      <h1>Chogs Kiosk</h1>
+      <small>Income Monitor • V6<br>Local device storage • iPhone & laptop friendly</small>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" title="Settings">⚙️</button>
+      <button class="icon-btn" title="Theme">🌙</button>
+    </div>
+  </div>
+  <nav>
+    <button class="active" data-tab="today">Today</button>
+    <button data-tab="week">This Week</button>
+    <button data-tab="month">This Month</button>
+  </nav>
+</header>
+
+<main class="wrap">
+  <section id="dashboard">
+    <div class="grid">
+      <div class="stat green"><span class="label">Transactions</span><b id="count">0</b></div>
+      <div class="stat purple"><span class="label">Total Income</span><b id="income">₱0.00</b></div>
+      <div class="stat blue"><span class="label">Cash-In</span><b id="cashin">₱0.00</b></div>
+      <div class="stat pink"><span class="label">Cash-Out</span><b id="cashout">₱0.00</b></div>
+      <div class="stat orange"><span class="label">E-Loading</span><b id="eload">₱0.00</b></div>
+      <div class="stat cyan"><span class="label">Bills Payment</span><b id="bills">₱0.00</b></div>
+    </div>
+
+    <div class="card">
+      <h3 id="periodTitle">Today</h3>
+      <div class="period-grid">
+        <div class="period-item"><span class="note">Income from all services</span><b id="periodIncome">₱0.00</b></div>
+        <div class="period-item"><span class="note">Transactions</span><b id="periodCount">0</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="add">
+    <h2>➕ Add Transaction</h2>
+    <p class="note">Record your daily transactions</p>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="date">📅 Date & time</label>
+        <input id="date" type="datetime-local">
+      </div>
+
+      <div class="field service-wrap">
+        <label for="service">▱ Service</label>
+        <select id="service">
+          <option>GCash Cash-In</option>
+          <option>GCash Cash-Out</option>
+          <option>E-loading</option>
+          <option>Bills Payment</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="amount">💵 Transaction amount (₱)</label>
+        <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+      </div>
+
+      <div class="field">
+        <label for="commission">📈 Your income / commission (₱)</label>
+        <input id="commission" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:14px">
+      <label for="ref">👤 Customer / reference (optional)</label>
+      <input id="ref" maxlength="80" placeholder="Optional">
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" onclick="addTx()">💾 Save Transaction</button>
+      <button class="btn muted" onclick="clearForm()">↻ Clear</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+      <h3 style="margin:0">Transaction History</h3>
+      <button class="btn danger" onclick="clearAll()">🗑 Delete All</button>
+    </div>
+    <div class="table-wrap" style="margin-top:10px">
+      <table>
+        <thead><tr><th>Date</th><th>Service</th><th>Amount</th><th>Income</th><th></th></tr></thead>
+        <tbody id="history"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" id="backup">
+    <h3>☁️ Backup & Restore</h3>
+    <p class="note">Your transactions stay on this device/browser. Export a backup regularly so you can restore it after changing phones or clearing browser data.</p>
+    <div class="small-actions">
+      <button class="btn primary" onclick="backup()">Export Backup</button>
+      <button class="btn muted" onclick="document.getElementById('restoreFile').click()">Restore Backup</button>
+      <input id="restoreFile" type="file" accept=".json,application/json" hidden onchange="restore(event)">
+    </div>
+  </section>
+</main>
+
+<div class="bottom-nav">
+  <button class="active" onclick="window.scrollTo({top:0,behavior:'smooth'})">⌂<br>Dashboard</button>
+  <button onclick="document.getElementById('add').scrollIntoView({behavior:'smooth'})">＋<br>Add</button>
+  <button onclick="document.getElementById('backup').scrollIntoView({behavior:'smooth'})">☁<br>Backup</button>
+</div>
+
+<script>
+const KEY="chogs_kiosk_v6_transactions";
+let tx=JSON.parse(localStorage.getItem(KEY)||"[]");
+let currentTab="today";
+
+const peso=n=>new Intl.NumberFormat("en-PH",{style:"currency",currency:"PHP"}).format(Number(n)||0);
+
+function save(){localStorage.setItem(KEY,JSON.stringify(tx));render();}
+
+function localDateValue(d=new Date()){
+  d=new Date(d.getTime()-d.getTimezoneOffset()*60000);
+  return d.toISOString().slice(0,16);
+}
+
+function clearForm(){
+  document.getElementById("date").value=localDateValue();
+  document.getElementById("amount").value="";
+  document.getElementById("commission").value="";
+  document.getElementById("ref").value="";
+}
+
+function addTx(){
+  const date=document.getElementById("date").value;
+  const service=document.getElementById("service").value;
+  const amount=Number(document.getElementById("amount").value);
+  const commission=Number(document.getElementById("commission").value);
+
+  if(!date||!Number.isFinite(amount)||amount<0||!Number.isFinite(commission)||commission<0){
+    alert("Please enter a valid date, amount, and income/commission.");
+    return;
+  }
+
+  tx.unshift({
+    id:Date.now().toString(36)+Math.random().toString(36).slice(2),
+    date,service,amount,commission,
+    ref:document.getElementById("ref").value.trim()
+  });
+  save();
+  clearForm();
+}
+
+function startOfWeek(d){
+  let x=new Date(d);x.setHours(0,0,0,0);
+  let day=x.getDay(),diff=(day+6)%7;
+  x.setDate(x.getDate()-diff);
+  return x;
+}
+
+function inPeriod(t){
+  let d=new Date(t.date),now=new Date();
+  if(currentTab==="today") return d.toDateString()===now.toDateString();
+  if(currentTab==="week"){
+    let s=startOfWeek(now),e=new Date(s);e.setDate(e.getDate()+7);
+    return d>=s&&d<e;
+  }
+  return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();
+}
+
+function sumService(s,list){
+  return list.filter(x=>x.service===s).reduce((a,x)=>a+(Number(x.commission)||0),0);
+}
+
+function render(){
+  const list=tx.filter(inPeriod);
+  const sum=k=>list.reduce((a,x)=>a+(Number(x[k])||0),0);
+
+  document.getElementById("count").textContent=list.length;
+  document.getElementById("income").textContent=peso(sum("commission"));
+  document.getElementById("cashin").textContent=peso(sumService("GCash Cash-In",list));
+  document.getElementById("cashout").textContent=peso(sumService("GCash Cash-Out",list));
+  document.getElementById("eload").textContent=peso(sumService("E-loading",list));
+  document.getElementById("bills").textContent=peso(sumService("Bills Payment",list));
+  document.getElementById("periodIncome").textContent=peso(sum("commission"));
+  document.getElementById("periodCount").textContent=list.length;
+  document.getElementById("periodTitle").textContent=
+    currentTab==="today"?"Today":
+    currentTab==="week"?"This Week (Mon–Sun)":"This Month";
+
+  const body=document.getElementById("history");
+  body.innerHTML="";
+  if(!list.length){
+    body.innerHTML='<tr><td colspan="5" class="empty">No transactions for this period.</td></tr>';
+    return;
+  }
+
+  list.forEach(x=>{
+    let tr=document.createElement("tr");
+    tr.innerHTML=
+      `<td>${new Date(x.date).toLocaleString([],{
+        month:"short",day:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit"
+      })}</td>
+      <td><b>${escapeHtml(x.service)}</b>${x.ref?'<br><span class="note">'+escapeHtml(x.ref)+'</span>':""}</td>
+      <td>${peso(x.amount)}</td>
+      <td>${peso(x.commission)}</td>
+      <td><button class="btn muted" onclick="delTx('${x.id}')">Delete</button></td>`;
+    body.appendChild(tr);
+  });
+}
+
+function delTx(id){
+  if(confirm("Delete this transaction?")){
+    tx=tx.filter(x=>x.id!==id);save();
+  }
+}
+
+function clearAll(){
+  if(confirm("Delete ALL Chogs Kiosk transactions? This cannot be undone unless you have a backup.")){
+    tx=[];save();
+  }
+}
+
+function backup(){
+  const blob=new Blob([
+    JSON.stringify({
+      app:"Chogs Kiosk V6",
+      exported:new Date().toISOString(),
+      transactions:tx
+    },null,2)
+  ],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="chogs-kiosk-v6-backup.json";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+function restore(e){
+  const f=e.target.files[0];
+  if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const o=JSON.parse(r.result);
+      if(!Array.isArray(o.transactions))throw 0;
+      if(confirm("Restore backup? This will replace current transactions.")){
+        tx=o.transactions;save();
+        alert("Backup restored successfully.");
+      }
+    }catch(_){
+      alert("Invalid Chogs Kiosk backup file.");
+    }
+    e.target.value="";
+  };
+  r.readAsText(f);
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+
+document.querySelectorAll("nav button").forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    currentTab=b.dataset.tab;
+    render();
+  };
+});
+
+document.getElementById("date").value=localDateValue();
+render();
+</script>
+</body>
+</html>
