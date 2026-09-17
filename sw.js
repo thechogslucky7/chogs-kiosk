@@ -1,4 +1,4 @@
-const CACHE = "chogs-kiosk-v6-shell-v1";
+const CACHE = "chogs-kiosk-v6-shell-v2";
 
 const ASSETS = [
   "./",
